@@ -26,7 +26,7 @@ class EmpDetailDatabaseHelper {
         }catch{
             print("Data Not Save")
         }
-    
+        
     }
     func getEmployeeData()->[EmployeeDetail]{
         var employee:[EmployeeDetail] = []

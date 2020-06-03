@@ -13,15 +13,13 @@ class EmployeeViewController: UIViewController,DataPass {
     @IBOutlet weak var txtEmpName: UITextField!
     @IBOutlet weak var txtEmpId: UITextField!
     @IBOutlet weak var btnSave: UIButton!
-    
-    var tempArr = [Employee]()
     var i = Int()
     var isUpdate = Bool()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboardWhenTappedAround()
-        tempArr = EmpDatabaseHelper.shareInstance.getEmployeeData()
+        //tempArr = EmpDatabaseHelper.shareInstance.getEmployeeData()
     }
     
     @IBAction func btnSaveClick(_ sender: Any) {
@@ -43,17 +41,17 @@ class EmployeeViewController: UIViewController,DataPass {
         }))
         alert.addAction(UIAlertAction(title: "OK",style: UIAlertAction.Style.default,
                                       handler: {(_: UIAlertAction!) in
-                                        self.txtEmpName.text = ""
-                                        self.txtEmpId.text = ""
+            self.txtEmpName.text = ""
+            self.txtEmpId.text = ""
         }))
         self.present(alert, animated: true, completion: nil)
         
     }
     
     @IBAction func btnEditClick(_ sender: Any) {
-    let vc = storyboard?.instantiateViewController(identifier:"DisplayEmpViewController")as! DisplayEmpViewController
-      vc.delegate = self
-     self.navigationController?.pushViewController(vc, animated: true)
+        let vc = storyboard?.instantiateViewController(identifier:"DisplayEmpViewController")as! DisplayEmpViewController
+        vc.delegate = self
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     func data(object: [String : String], index: Int, isEdit: Bool) {
         txtEmpName.text = object["empName"]

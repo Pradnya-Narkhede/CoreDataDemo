@@ -13,18 +13,17 @@ import UIKit
 class EmpDatabaseHelper {
     
     static let shareInstance = EmpDatabaseHelper()
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
-    let moc = NSManagedObjectContextConcurrencyType.mainQueueConcurrencyType
-//    let privateMOC = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-//    privateMOC.parentContext = moc
-
+   // let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    lazy var backgroundContext: NSManagedObjectContext = {
+        return (UIApplication.shared.delegate as! AppDelegate).persistentContainer.newBackgroundContext()
+    }()
     
     func save(object:[String:String]){
-        let entityName = NSEntityDescription.insertNewObject(forEntityName: "Employee", into: context)as! Employee
+        let entityName = NSEntityDescription.insertNewObject(forEntityName: "Employee", into: backgroundContext)as! Employee
         entityName.empId = object["empId"]
         entityName.empName = object["empName"]
         do{
-            try self.context.save()
+            try self.backgroundContext.save()
         }catch{
             print("Data Not Save")
         }    
@@ -32,21 +31,23 @@ class EmpDatabaseHelper {
     
     func getEmployeeData()->[Employee]{
         var employee:[Employee] = []
+        // backgroundContext.perform {
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Employee")
         do{
-            employee = try context.fetch(fetchRequest) as! [Employee]
+            employee = try self.backgroundContext.fetch(fetchRequest) as! [Employee]
         }catch{
             print("Data Not Show")
         }
-       return employee
+        //}
+        return employee
     }
     
     func deleteData(index:Int)->[Employee]{
         var employee = getEmployeeData()
-        context.delete(employee[index])
+        backgroundContext.delete(employee[index])
         employee.remove(at: index)
         do{
-            try context.save()
+            try backgroundContext.save()
         }catch{
             print("Can not delete data")
         }
@@ -58,10 +59,10 @@ class EmpDatabaseHelper {
         employee[i].empName = object["empName"]
         employee[i].empId = object["empId"]
         do{
-            try context.save()
+            try backgroundContext.save()
         }catch{
             print("Can not Edit data")
         }
-    
+        
     }
 }

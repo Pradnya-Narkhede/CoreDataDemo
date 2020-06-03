@@ -17,11 +17,16 @@ class DisplayEmpViewController: UIViewController {
     var empArr = [Employee]()
     var empDetailArr = [EmployeeDetail]()
     var delegate : DataPass!
+    var empData = [Employee]()
     // var dele = DataPass.self
     
     override func viewDidLoad() {
         super.viewDidLoad()
         empArr = EmpDatabaseHelper.shareInstance.getEmployeeData()
+        for employee in empArr{
+            let empObj = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: employee.objectID)
+            self.empData.append(empObj as! Employee)
+        }
     }
 }
 
@@ -31,12 +36,12 @@ extension DisplayEmpViewController : UITableViewDataSource,UITableViewDelegate{
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return empArr.count
+        return empData.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell.init(style:.default, reuseIdentifier: "cell")
-        cell.textLabel?.text = empArr[indexPath.row].empName
+        cell.textLabel?.text = empData[indexPath.row].empName
         cell.accessoryType = .detailButton
         return cell
     }
@@ -44,16 +49,16 @@ extension DisplayEmpViewController : UITableViewDataSource,UITableViewDelegate{
         let empDetailVC = storyboard?.instantiateViewController(identifier: "DisplayEmpDetailViewController")as! DisplayEmpDetailViewController
         var emp = EmpModel()
         
-        if let name = empArr[indexPath.row].empName{
+        if let name = empData[indexPath.row].empName{
             emp.name = name
         }
-        if let id = empArr[indexPath.row].empId{
+        if let id = empData[indexPath.row].empId{
             emp.id = id
         }
-        if let address = empArr[indexPath.row].has?.empAddr{
+        if let address = empData[indexPath.row].has?.empAddr{
             emp.address = address
         }
-        if let phone =  empArr[indexPath.row].has?.empPhone{
+        if let phone =  empData[indexPath.row].has?.empPhone{
             emp.phone = phone
         }
         empDetailVC.empModel = emp
@@ -64,13 +69,13 @@ extension DisplayEmpViewController : UITableViewDataSource,UITableViewDelegate{
     }
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete{
-            empArr = EmpDatabaseHelper.shareInstance.deleteData(index: indexPath.row)
+            empData = EmpDatabaseHelper.shareInstance.deleteData(index: indexPath.row)
             self.tableOfEmp.deleteRows(at: [indexPath], with: .automatic)
         }
     }
     func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
         print("Tapped")
-        let dict = ["empName":empArr[indexPath.row].empName!,"empId":empArr[indexPath.row].empId!]
+        let dict = ["empName":empData[indexPath.row].empName!,"empId":empData[indexPath.row].empId!]
         
         if let editData = delegate{
             editData.data(object: dict , index:indexPath.row, isEdit: true)

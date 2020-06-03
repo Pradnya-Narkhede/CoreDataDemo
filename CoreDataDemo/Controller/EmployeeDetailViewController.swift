@@ -16,13 +16,18 @@ class EmployeeDetailViewController: UIViewController{
     @IBOutlet weak var txtEmpAddr: UITextField!
     @IBOutlet weak var btnSave: UIButton!
     
+    var empData = [Employee]()
     var empArr = [Employee]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboardWhenTappedAround()
         empArr = EmpDatabaseHelper.shareInstance.getEmployeeData()
-        //empDetailArr = EmpDetailDatabaseHelper.shareInstance.getEmployeeData()
+        for employee in empArr{
+            let empObj = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext.object(with: employee.objectID)
+            self.empData.append(empObj as! Employee)
+        }
+        
     }
     
     @IBAction func btnSaveClick(_ sender: Any) {
@@ -53,15 +58,15 @@ extension EmployeeDetailViewController : UIPickerViewDataSource,UIPickerViewDele
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return empArr.count
+        return empData.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return empArr[row].empName
+        return empData[row].empName
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        let temp = empArr[row]
+        let temp = empData[row]
         EmpDetailDatabaseHelper.selectedEmp = temp
     }
     
